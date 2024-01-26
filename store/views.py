@@ -88,7 +88,7 @@ class TeacherViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter]
     # filterset_fields = ['subject', 'experience', 'english_fluency']
     filterset_class = TeacherFilter
-    search_fields = ["teacher_name"]
+    search_fields = ["teacher_name","roll_no"]
 
     # def get_queryset(self):
     #     queryset = Teachers.objects.all()
