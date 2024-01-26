@@ -1,6 +1,7 @@
 from django.db import models
 from django.dispatch import receiver
 from django.db.models.signals import pre_delete
+from django.core.exceptions import ValidationError
 # Create your models here.
 
 
@@ -15,8 +16,8 @@ class Subject(models.Model):
 def protect_subject_delete(sender, instance, **kwargs):
     # Check if any teachers are associated with the subject
     if instance.teachers.exists():
-        raise models.ProtectedError("Cannot delete the subject as it is associated with teachers.", [instance])
-
+        raise ValidationError("Cannot delete the subject as it is associated with teachers.")
+    
 class Teachers(models.Model):
     YEARS_CHOICES = [
         ('5+ Year', 5),

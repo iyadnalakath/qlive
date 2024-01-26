@@ -6,6 +6,10 @@ class SubjectSerializer(serializers.ModelSerializer):
         model = Subject
         fields = ["id", "name"]
 
+class SubjectListSerializer(serializers.Serializer):
+    subject_count = serializers.IntegerField()
+    subjects = SubjectSerializer(many=True)
+
 
 class TeacherSerializer(serializers.ModelSerializer):
     total_rating = serializers.SerializerMethodField()
@@ -112,3 +116,11 @@ class SimpleTeacherSerializer(serializers.ModelSerializer):
         ) / 3
 
         return total_rating
+    
+class SimpleTeacherListSerializer(serializers.Serializer):
+    total_count = serializers.IntegerField()
+    teachers = SimpleTeacherSerializer(many=True)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        return data

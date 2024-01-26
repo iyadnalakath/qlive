@@ -20,8 +20,13 @@ class SubjectViewSet(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         if request.user.role in ["admin", "staff"]:
-            queryset = Subject.objects.all() 
-            serializer = SubjectSerializer(queryset, many=True)
+            subjects = Subject.objects.all()
+            subject_count = Subject.objects.count()
+
+            serializer = SubjectListSerializer({
+                'subject_count': subject_count,
+                'subjects': subjects
+            })
             return Response(serializer.data)
         else:
             raise PermissionDenied("You are not allowed to view subjects.")
@@ -48,12 +53,21 @@ class SubjectViewSet(ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
-        subjetct = self.get_object()
-        if request.user.role == "admin":
-            subjetct.delete()
-            return Response({'response': 'Subject deleted successfully.'},status=status.HTTP_204_NO_CONTENT)
-        else:
-            raise PermissionDenied("You are not allowed to delete this object.")
+        subject = self.get_object()
+
+        try:
+            # Trigger pre_delete signal to check association with teachers
+            protect_subject_delete(sender=Subject, instance=subject)
+
+            if request.user.role == "admin":
+                subject.delete()
+                return Response({'response': 'Subject deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+            else:
+                raise PermissionDenied("You are not allowed to delete this object.")
+        except ValidationError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Subject.DoesNotExist:
+            return Response({'error': 'Subject not found.'}, status=status.HTTP_404_NOT_FOUND)
 
     def update(self, request, *args, **kwargs):
         subjetct = self.get_object()
@@ -85,6 +99,30 @@ class TeacherViewSet(ModelViewSet):
     #         queryset = sorted(queryset, key=lambda x: x.get_total_rating(), reverse=True)
 
     #     return queryset
+
+    
+    def list(self, request, *args, **kwargs):
+        if request.user.role in ["admin", "staff"]:
+            queryset = Teachers.objects.all()
+            queryset = self.filter_queryset(queryset)
+            
+            ordering_param = self.request.query_params.get('ordering', 'total_rating')
+            total_count = queryset.count()
+            if ordering_param == 'total_rating':
+                serializer = SimpleTeacherSerializer(queryset, many=True)
+
+                sorted_data = sorted(serializer.data, key=lambda x: x['total_rating'], reverse=True)
+                response_data = {
+                'total_count': total_count,
+                'teachers': sorted_data
+            }
+                return Response(response_data)
+            
+            serializer = SimpleTeacherSerializer(queryset, many=True)
+            return Response(serializer.data)
+        else:
+            raise PermissionDenied("You are not allowed to view subjects.")
+
     
     def create(self, request, *args, **kwargs):
         serializer = TeacherSerializer(data=request.data)
@@ -126,19 +164,3 @@ class TeacherViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             raise PermissionDenied("You are not allowed to view this object.")
-
-    def list(self, request, *args, **kwargs):
-        if request.user.role in ["admin", "staff"]:
-            queryset = Teachers.objects.all()
-            queryset = self.filter_queryset(queryset)
-
-            ordering_param = self.request.query_params.get('ordering', 'total_rating')
-            if ordering_param == 'total_rating':
-                serializer = SimpleTeacherSerializer(queryset, many=True)
-                sorted_data = sorted(serializer.data, key=lambda x: x['total_rating'], reverse=True)
-                return Response(sorted_data)
-            
-            serializer = SimpleTeacherSerializer(queryset, many=True)
-            return Response(serializer.data)
-        else:
-            raise PermissionDenied("You are not allowed to view subjects.")
