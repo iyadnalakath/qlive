@@ -19,12 +19,6 @@ def protect_subject_delete(sender, instance, **kwargs):
         raise ValidationError("Cannot delete the subject as it is associated with teachers.")
     
 class Teachers(models.Model):
-    YEARS_CHOICES = [
-        ('5+ Year', 5),
-        ('3+ Year', 4.5),
-        ('1+ Year', 4),
-        ('<1 Year', 3),
-    ]
 
     english_fluency_choices = [
         ('100%', 5),
@@ -41,13 +35,13 @@ class Teachers(models.Model):
     ]
 
     teacher_name = models.CharField(max_length=255, null=False, blank=False)
-    roll_no = models.IntegerField(null=True, blank=True)
+    roll_no = models.IntegerField(unique=True,null=True, blank=True)
     subject = models.ManyToManyField(
         Subject, related_name="teachers",blank=True
     )
     whatsapp_no = models.CharField(max_length=25, null=True, blank=True)
     email = models.EmailField(max_length=255,null=True,blank=True)
-    experience = models.CharField(max_length=15, choices=YEARS_CHOICES,null=True,blank=True)
+    experience = models.FloatField(default=0, null=True, blank=True)
     english_fluency = models.CharField(max_length=15, choices=english_fluency_choices,null=True,blank=True)
     interview_rating = models.CharField(max_length=15, choices=interview_rating_choices,null=True,blank=True)
     date = models.DateTimeField(auto_now=True)
@@ -58,8 +52,12 @@ class Teachers(models.Model):
     bank_name = models.CharField(max_length=255, null=True, blank=True)
     branch = models.CharField(max_length=255, null=True, blank=True)
     ifsc_code = models.CharField(max_length=255, null=True, blank=True)
-    demo_rating = models.IntegerField(null=True, blank=True)
+    success_demo = models.IntegerField(default=0)
+    failed_demo = models.IntegerField(default=0)
+    teacher_change = models.IntegerField(default=0)
     about = models.TextField(null=True, blank=True)
     remark = models.TextField(null=True, blank=True)
     qualification = models.CharField(max_length=255, null=True, blank=True)
+    black_list = models.BooleanField(default=False)
+    active = models.BooleanField(default=False)
     

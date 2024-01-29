@@ -90,16 +90,6 @@ class TeacherViewSet(ModelViewSet):
     filterset_class = TeacherFilter
     search_fields = ["teacher_name","roll_no"]
 
-    # def get_queryset(self):
-    #     queryset = Teachers.objects.all()
-    #     queryset = self.filter_queryset(queryset)
-
-    #     # If ordering by 'total_rating', perform the custom ordering
-    #     if 'total_rating' in self.request.query_params.get('ordering', ''):
-    #         queryset = sorted(queryset, key=lambda x: x.get_total_rating(), reverse=True)
-
-    #     return queryset
-
     
     def list(self, request, *args, **kwargs):
         if request.user.role in ["admin", "staff"]:

@@ -8,6 +8,11 @@ class TeacherFilter(django_filters.FilterSet):
         label='Has Roll No',
     )
 
+    experience = filters.NumberFilter(
+        method='filter_experience',
+        label='Experience',
+    )
+
     def filter_has_roll_no(self, queryset, name, value):
         if value:
             # Filter teachers with roll numbers
@@ -15,6 +20,11 @@ class TeacherFilter(django_filters.FilterSet):
         else:
             # Filter teachers without roll numbers
             return queryset.exclude(roll_no__isnull=False)
+        
+
+    def filter_experience(self, queryset, name, value):
+        # Filter teachers with experience greater than or equal to the provided value
+        return queryset.filter(experience__gte=value)
 
     class Meta:
         model = Teachers

@@ -14,7 +14,7 @@ class SubjectListSerializer(serializers.Serializer):
 class TeacherSerializer(serializers.ModelSerializer):
     total_rating = serializers.SerializerMethodField()
     subject_name = serializers.StringRelatedField(source="subject", many=True, read_only=True)
-    # roll_no = serializers.IntegerField(required=False, allow_null=True)
+    total_point = serializers.SerializerMethodField()
     class Meta:
         model = Teachers
         fields = [
@@ -37,7 +37,12 @@ class TeacherSerializer(serializers.ModelSerializer):
             "about",
             "remark",
             "qualification",
-            "demo_rating",
+            "success_demo",
+            "failed_demo",
+            "teacher_change",
+            "total_point",
+            "black_list",
+            "active",
             "english_fluency",
             "interview_rating",
             "total_rating",
@@ -50,7 +55,17 @@ class TeacherSerializer(serializers.ModelSerializer):
         english_fluency_rating = obj.english_fluency
         interview_rating = obj.interview_rating
 
- 
+        if experience_rating >= 5:
+            experience_rating_value = 5
+        elif 4 <= experience_rating < 5:
+            experience_rating_value = 4.5
+        elif 3 <= experience_rating < 4:
+            experience_rating_value = 4
+        elif experience_rating < 3:
+            experience_rating_value = 3
+        else:
+            experience_rating_value = 0
+
         rating_mapping = {
             '5+ Year': 5,
             '3+ Year': 4.5,
@@ -63,13 +78,23 @@ class TeacherSerializer(serializers.ModelSerializer):
         }
 
         total_rating = (
-            rating_mapping.get(experience_rating, 0) +
+            experience_rating_value +
             rating_mapping.get(english_fluency_rating, 0) +
             rating_mapping.get(interview_rating, 0)
         ) / 3
-
+        total_rating = round(total_rating, 1)
         return total_rating
     
+    def get_total_point(self, obj):
+
+        success_demo_point = obj.success_demo
+        failed_demo_point = obj.failed_demo
+        teacher_change_point = obj.teacher_change
+
+ 
+        total_point = success_demo_point+failed_demo_point+teacher_change_point
+
+        return total_point
     
     def to_representation(self, instance):
         ret = super().to_representation(instance)
@@ -86,10 +111,10 @@ class SimpleTeacherSerializer(serializers.ModelSerializer):
             "id",
             "teacher_name",
             "roll_no",
+            "black_list",
             "total_rating",
             "about",
         ]
-
 
     def get_total_rating(self, obj):
 
@@ -97,7 +122,17 @@ class SimpleTeacherSerializer(serializers.ModelSerializer):
         english_fluency_rating = obj.english_fluency
         interview_rating = obj.interview_rating
 
- 
+        if experience_rating >= 5:
+            experience_rating_value = 5
+        elif 4 <= experience_rating < 5:
+            experience_rating_value = 4.5
+        elif 3 <= experience_rating < 4:
+            experience_rating_value = 4
+        elif experience_rating < 3:
+            experience_rating_value = 3
+        else:
+            experience_rating_value = 0
+
         rating_mapping = {
             '5+ Year': 5,
             '3+ Year': 4.5,
@@ -110,11 +145,11 @@ class SimpleTeacherSerializer(serializers.ModelSerializer):
         }
 
         total_rating = (
-            rating_mapping.get(experience_rating, 0) +
+            experience_rating_value +
             rating_mapping.get(english_fluency_rating, 0) +
             rating_mapping.get(interview_rating, 0)
         ) / 3
-
+        total_rating = round(total_rating, 1)
         return total_rating
     
 class SimpleTeacherListSerializer(serializers.Serializer):

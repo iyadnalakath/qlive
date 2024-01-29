@@ -28,7 +28,6 @@ class TeachersAdmin(admin.ModelAdmin):
         "about",
         "remark",
         "qualification",
-        "demo_rating",
         "english_fluency",
         "interview_rating",
         
