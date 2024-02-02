@@ -1,12 +1,17 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import Account
+from .models import Account,PasswordRest
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework import status
 from django.conf import settings
 from urllib.parse import urljoin
+from .function import send_password_reset_email,send_otp_email
+import string
+import random
+from django.core.exceptions import ObjectDoesNotExist
 
 
 
@@ -94,3 +99,101 @@ class UserListSerializer(serializers.ModelSerializer):
             "is_staff",
             "phone",
         )
+
+
+
+
+# class PasswordResetSerializer(serializers.Serializer):
+#     email = serializers.EmailField()
+
+#     def validate_email(self, value):
+#         try:
+#             user = Account.objects.get(email=value)
+#         except Account.DoesNotExist:
+#             raise serializers.ValidationError("Invalid email address.")
+#         return value
+
+
+#     def save(self):
+#         user = Account.objects.get(email=self.validated_data['email'])
+#         token = PasswordRest.objects.create(account=user).id
+#         # token = PasswordResetTokenGenerator().make_token(user)
+#         send_password_reset_email(user.email, token)
+#         print(token)
+#         return {'token': token, 'parent_serializer_context': self.context}
+        
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        try:
+            user = Account.objects.get(email=value)
+        except Account.DoesNotExist:
+            raise serializers.ValidationError("Invalid email address.")
+        return value
+
+    def save(self):
+        user = Account.objects.get(email=self.validated_data['email'])
+        
+        # Generate 4-digit OTP
+        otp = ''.join(random.choices(string.digits, k=4))
+        
+        # Save OTP in PasswordRest model
+        password_reset_instance = PasswordRest.objects.create(account=user, otp=otp)
+        print(otp)
+        
+        # Send the OTP via email (implement send_otp_email function)
+        send_otp_email(user.email, otp)
+
+        return {'otp_instance': password_reset_instance.id, 'parent_serializer_context': self.context}
+        
+class OTPConfirmationSerializer(serializers.Serializer):
+    otp = serializers.CharField(max_length=4)
+    token = serializers.CharField()
+
+    def validate(self, data):
+        # Validate OTP against the stored OTP in PasswordRest
+        try:
+            password_reset_instance = PasswordRest.objects.get(pk=data['token'], is_active=True)
+            if password_reset_instance.otp != data['otp']:
+                raise serializers.ValidationError("Invalid OTP.")
+        except PasswordRest.DoesNotExist:
+            raise serializers.ValidationError("Invalid token.")
+        
+        return data
+
+# class PasswordConfirmSerializer(serializers.Serializer):
+#     password = serializers.CharField(max_length=128)
+#     confirm_password = serializers.CharField(max_length=128)
+#     token = serializers.UUIDField()
+
+#     def validate(self, data):
+#         if data['password'] != data['confirm_password']:
+#             raise serializers.ValidationError("Passwords do not match.")
+#         return data
+
+#     def save(self):
+#         try:
+#             user = PasswordRest.objects.get(pk=self.validated_data['token'], is_active=True).account
+#             user.password = make_password(self.validated_data['password'])
+#             user.save()
+#         except ObjectDoesNotExist:
+#             raise serializers.ValidationError("Invalid token or token has expired.")
+
+class PasswordConfirmSerializer(serializers.Serializer):
+    password = serializers.CharField(max_length=128)
+    confirm_password = serializers.CharField(max_length=128)
+    token = serializers.UUIDField()
+
+    def validate(self, data):
+        if data['password'] != data['confirm_password']:
+            raise serializers.ValidationError("Passwords do not match.")
+        return data
+
+    def save(self):
+        try:
+            user = PasswordRest.objects.get(pk=self.validated_data['token'], is_active=True).account
+            user.set_password(self.validated_data['password'])
+            user.save()
+        except ObjectDoesNotExist:
+            raise serializers.ValidationError("Invalid token or token has expired.")

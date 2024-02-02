@@ -93,23 +93,23 @@ WSGI_APPLICATION = 'qlive.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'qlive',
-        'USER': 'postgres',
-        'PASSWORD': '9895muh',
-        'HOST': 'localhost',  # Set to the PostgreSQL server's address
-        'PORT': '5432',       # Default PostgreSQL port
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'qlive',
+#         'USER': 'postgres',
+#         'PASSWORD': '9895muh',
+#         'HOST': 'localhost',  # Set to the PostgreSQL server's address
+#         'PORT': '5432',       # Default PostgreSQL port
+#     }
+# }
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -162,3 +162,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'mailslurp.mx'
+EMAIL_HOST_USER = '06Lj4uiMv9aqhNAzrYK9veAlCJrp7SJe'
+EMAIL_HOST_PASSWORD = 'nH1e1xrYfmEc5PAYzmbRsTD5kl7vzIGb'
+# EMAIL_HOST_PASSWORD = '9895Muha#'
+EMAIL_PORT = 2587
+# DEFAULT_FROM_EMAIL = 'AYESHA ZIYA'

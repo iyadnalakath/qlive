@@ -5,6 +5,9 @@ from django.dispatch import receiver
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.db.models.signals import post_save
+import string
+import random
+import uuid
 
 
 
@@ -110,3 +113,22 @@ class Account(AbstractBaseUser):
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
+
+
+
+def password_generater(length):
+    length = 8
+    chars = string.ascii_letters + string.digits + '!@#$%^&*()'
+    rnd = random.SystemRandom()
+    return(''.join(rnd.choice(chars) for i in range(length)))
+
+# class PasswordRest(models.Model):
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+#     account = models.ForeignKey(Account,on_delete=models.CASCADE)
+#     is_active = models.BooleanField(default=True, null=True, blank=True)
+
+class PasswordRest(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    account = models.ForeignKey(Account, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True, null=True, blank=True)
+    otp = models.CharField(max_length=4, null=True, blank=True)
