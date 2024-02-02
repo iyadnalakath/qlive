@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
+from django.core.exceptions import PermissionDenied
 from rest_framework.response import Response
-from rest_framework.filters import SearchFilter,OrderingFilter
+from rest_framework.filters import SearchFilter
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticated
 from .models import *
 from .serializer import *
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from django.core.exceptions import PermissionDenied
 from .filters import TeacherFilter
 
 # Create your views here.

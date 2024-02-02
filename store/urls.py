@@ -4,9 +4,7 @@ from . import views
 from .views import *
 
 urlpatterns = [
-    # path("popular/", PopularityViewSetList.as_view(), name="popular-product-list"),
-    # path('location/', LocationCreateAPIView.as_view(), name='location_create'),
-    # path('location/', LocationView.as_view(), name='location'),
+    
 ]
 
 router = routers.DefaultRouter()

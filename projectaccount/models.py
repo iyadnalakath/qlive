@@ -1,13 +1,13 @@
-from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from rest_framework.authtoken.models import Token
-from django.dispatch import receiver
-from django.conf import settings
-from django.contrib.auth import authenticate
-from django.db.models.signals import post_save
 import string
 import random
 import uuid
+from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+from django.conf import settings
+from rest_framework.authtoken.models import Token
+
 
 
 
@@ -100,13 +100,6 @@ class Account(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
     
-# class TeamProfile(BaseModel):
-#     account = models.ForeignKey(
-#         Account, on_delete=models.CASCADE, related_name="team_profilepic", null=True, blank=True
-#     )
-#     team_profile = models.ImageField(
-#         upload_to="mediafiles", default="", null=True, blank=True
-#     )
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
@@ -122,10 +115,6 @@ def password_generater(length):
     rnd = random.SystemRandom()
     return(''.join(rnd.choice(chars) for i in range(length)))
 
-# class PasswordRest(models.Model):
-#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     account = models.ForeignKey(Account,on_delete=models.CASCADE)
-#     is_active = models.BooleanField(default=True, null=True, blank=True)
 
 class PasswordRest(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

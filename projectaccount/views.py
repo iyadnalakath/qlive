@@ -1,7 +1,14 @@
 from django.shortcuts import render
+from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import AllowAny
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics
 from .serializer import (
     LoginSerializer,
     RegisterStaffSerializer,
@@ -11,16 +18,10 @@ from .serializer import (
     PasswordConfirmSerializer,
     OTPConfirmationSerializer
 )
-from rest_framework.authtoken.models import Token
-from rest_framework.permissions import AllowAny
-from django.core.exceptions import PermissionDenied
-from rest_framework import generics
-from .models import *
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from rest_framework import generics
-from django.http import Http404
-from rest_framework.decorators import permission_classes
-from django.core.exceptions import ObjectDoesNotExist
+from .models import Account,PasswordRest
+
+
+
 
 
 
@@ -168,28 +169,20 @@ class OTPConfirmationView(APIView):
         try:
             # Mark the PasswordRest instance as inactive after OTP confirmation
             password_reset_instance = PasswordRest.objects.get(pk=serializer.validated_data['token'])
-            password_reset_instance.is_active = False
+            password_reset_instance.is_active = True
             password_reset_instance.save()
 
             return Response({'detail': 'OTP confirmed successfully.'})
         except PasswordRest.DoesNotExist:
             return Response({'detail': 'Invalid token.'}, status=status.HTTP_400_BAD_REQUEST)
     
+        
 class PasswordConfirmView(APIView):
     serializer_class = PasswordConfirmSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        try:
-            # Mark the PasswordRest instance as inactive after password confirmation
-            password_reset_instance = PasswordRest.objects.get(pk=serializer.validated_data['token'])
-            password_reset_instance.is_active = False
-            password_reset_instance.save()
-
-            # Optionally, you can revoke any existing authentication tokens here
-
-            return Response({'detail': 'Password reset successfully.'})
-        except ObjectDoesNotExist:
-            return Response({'detail': 'Invalid token or token has expired.'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response({'detail': 'Password reset successfully.'})
+    

@@ -1,17 +1,11 @@
-from rest_framework import serializers
-from django.contrib.auth import authenticate
-from .models import Account,PasswordRest
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.models import User
-from rest_framework.authtoken.models import Token
-from rest_framework.response import Response
-from rest_framework import status
-from django.conf import settings
-from urllib.parse import urljoin
-from .function import send_password_reset_email,send_otp_email
 import string
 import random
-from django.core.exceptions import ObjectDoesNotExist
+from uuid import UUID
+from rest_framework import serializers
+from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import make_password
+from .models import Account,PasswordRest
+from .function import send_otp_email
 
 
 
@@ -101,26 +95,6 @@ class UserListSerializer(serializers.ModelSerializer):
         )
 
 
-
-
-# class PasswordResetSerializer(serializers.Serializer):
-#     email = serializers.EmailField()
-
-#     def validate_email(self, value):
-#         try:
-#             user = Account.objects.get(email=value)
-#         except Account.DoesNotExist:
-#             raise serializers.ValidationError("Invalid email address.")
-#         return value
-
-
-#     def save(self):
-#         user = Account.objects.get(email=self.validated_data['email'])
-#         token = PasswordRest.objects.create(account=user).id
-#         # token = PasswordResetTokenGenerator().make_token(user)
-#         send_password_reset_email(user.email, token)
-#         print(token)
-#         return {'token': token, 'parent_serializer_context': self.context}
         
 class PasswordResetSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -162,28 +136,11 @@ class OTPConfirmationSerializer(serializers.Serializer):
         
         return data
 
-# class PasswordConfirmSerializer(serializers.Serializer):
-#     password = serializers.CharField(max_length=128)
-#     confirm_password = serializers.CharField(max_length=128)
-#     token = serializers.UUIDField()
-
-#     def validate(self, data):
-#         if data['password'] != data['confirm_password']:
-#             raise serializers.ValidationError("Passwords do not match.")
-#         return data
-
-#     def save(self):
-#         try:
-#             user = PasswordRest.objects.get(pk=self.validated_data['token'], is_active=True).account
-#             user.password = make_password(self.validated_data['password'])
-#             user.save()
-#         except ObjectDoesNotExist:
-#             raise serializers.ValidationError("Invalid token or token has expired.")
-
+    
 class PasswordConfirmSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=128)
     confirm_password = serializers.CharField(max_length=128)
-    token = serializers.UUIDField()
+    token = serializers.CharField()
 
     def validate(self, data):
         if data['password'] != data['confirm_password']:
@@ -192,8 +149,12 @@ class PasswordConfirmSerializer(serializers.Serializer):
 
     def save(self):
         try:
-            user = PasswordRest.objects.get(pk=self.validated_data['token'], is_active=True).account
-            user.set_password(self.validated_data['password'])
+            token_uuid = UUID(str(self.validated_data['token']))
+            print(f"Token UUID: {token_uuid}")
+            user = PasswordRest.objects.get(pk=token_uuid, is_active=True).account
+            user.password = make_password(self.validated_data['password'])
             user.save()
-        except ObjectDoesNotExist:
-            raise serializers.ValidationError("Invalid token or token has expired.")
+        except PasswordRest.DoesNotExist:
+            raise serializers.ValidationError("Invalid or expired token.")
+        except Exception as e:
+            raise serializers.ValidationError(f"An error occurred: {str(e)}")

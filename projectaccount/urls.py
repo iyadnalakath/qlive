@@ -25,10 +25,5 @@ urlpatterns = [
 
 
 router = routers.DefaultRouter()
-# router.register("userslist", views.SingleUserView),
-
-# router.register("event_management_users", views.EventManagementUsersView)
-# router.register('eventteamlistsubcatagory',views.EventManagementSubcategoryViewSet,basename='MyModel')
-
 
 urlpatterns = router.urls + urlpatterns
