@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Subject,Teachers
+from .models import Subject,Teachers,Grade,Remuneration
 
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,10 +11,32 @@ class SubjectListSerializer(serializers.Serializer):
     subjects = SubjectSerializer(many=True)
 
 
+class GradeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Grade
+        fields = ["id", "name"]
+
+class RemunerationSerializer(serializers.ModelSerializer):
+    teacher = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Remuneration
+        fields = ['id','teacher', 'grade', 'min_remuneration', 'max_remuneration']
+
+    def get_teacher(self, obj):
+        teacher = obj.teacher
+        return {
+            "id": teacher.id,
+            "teacher_name": teacher.teacher_name,
+            
+        }
 class TeacherSerializer(serializers.ModelSerializer):
     total_rating = serializers.SerializerMethodField()
     subject_name = serializers.StringRelatedField(source="subject", many=True, read_only=True)
     total_point = serializers.SerializerMethodField()
+    remunerations = RemunerationSerializer(many=True)
+    # remunerations_details = serializers.SerializerMethodField()
+
     class Meta:
         model = Teachers
         fields = [
@@ -22,13 +44,11 @@ class TeacherSerializer(serializers.ModelSerializer):
             "teacher_name",
             "roll_no",
             "subject",
-            "subject_name", 
+            "subject_name",
             "whatsapp_no",
             "email",
             "experience",
             "date",
-            "remuneration_min",
-            "remuneration_max",
             "video_link",
             "bank_acc_holder_name",
             "bank_name",
@@ -46,9 +66,35 @@ class TeacherSerializer(serializers.ModelSerializer):
             "english_fluency",
             "interview_rating",
             "total_rating",
+            "remunerations",
+            # "remunerations_details"
         ]
-    
 
+    def create(self, validated_data):
+        remuneration_data = validated_data.pop('remunerations', None)
+        subject_data = validated_data.pop('subject', None)
+
+        teacher = Teachers.objects.create(**validated_data)
+
+        if subject_data:
+            teacher.subject.set(subject_data)
+
+        if remuneration_data:
+            for remuneration_item in remuneration_data:
+                grade_instance = remuneration_item.pop('grade', None)
+                Remuneration.objects.create(teacher=teacher, grade=grade_instance, **remuneration_item)
+
+        return teacher
+    
+    # def get_remunerations_details(self, instance):
+    #     remunerations_data = RemunerationSerializer(instance.remunerations.all(), many=True).data
+    #     return remunerations_data
+
+    # def to_representation(self, instance):
+    #     ret = super().to_representation(instance)
+    #     ret['remunerations_details'] = self.get_remunerations_details(instance)
+    #     return ret
+    
     def get_total_rating(self, obj):
 
         experience_rating = obj.experience
@@ -100,7 +146,7 @@ class TeacherSerializer(serializers.ModelSerializer):
         ret = super().to_representation(instance)
         ret['subject_name'] = [subject.name for subject in instance.subject.all()]
         return ret
-    
+
 
 class SimpleTeacherSerializer(serializers.ModelSerializer):
     total_rating = serializers.SerializerMethodField()

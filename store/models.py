@@ -18,6 +18,25 @@ def protect_subject_delete(sender, instance, **kwargs):
     if instance.teachers.exists():
         raise ValidationError("Cannot delete the subject as it is associated with teachers.")
     
+
+class Grade(models.Model):
+    name = models.CharField(max_length=255,unique=False)
+
+    def __str__(self):
+        return self.name
+    
+@receiver(pre_delete, sender=Grade)
+def protect_grade_delete(sender, instance, **kwargs):
+    # Check if any remunerations are associated with the grade
+    if instance.grade_remunerations.exists():
+        raise ValidationError("Cannot delete the grade as it is associated with teacher")
+    
+class Remuneration(models.Model):
+    teacher = models.ForeignKey('Teachers', on_delete=models.CASCADE, related_name='remunerations')
+    grade = models.ForeignKey(Grade, on_delete=models.CASCADE, related_name='grade_remunerations')
+    min_remuneration = models.DecimalField(max_digits=10, decimal_places=2)
+    max_remuneration = models.DecimalField(max_digits=10, decimal_places=2)
+
 class Teachers(models.Model):
 
     english_fluency_choices = [
@@ -37,16 +56,17 @@ class Teachers(models.Model):
     teacher_name = models.CharField(max_length=255, null=False, blank=False)
     roll_no = models.IntegerField(unique=True,null=True, blank=True)
     subject = models.ManyToManyField(
-        Subject, related_name="teachers",blank=True
+        Subject, related_name="teachers_subject",blank=True
     )
+    # grade = models.ManyToManyField(
+    #     Grade, related_name="teacher_grades",blank=True
+    # )
     whatsapp_no = models.CharField(max_length=25, null=True, blank=True)
     email = models.EmailField(max_length=255,null=True,blank=True)
     experience = models.FloatField(default=0, null=True, blank=True)
     english_fluency = models.CharField(max_length=15, choices=english_fluency_choices,null=True,blank=True)
     interview_rating = models.CharField(max_length=15, choices=interview_rating_choices,null=True,blank=True)
     date = models.DateTimeField(auto_now=True)
-    remuneration_min = models.IntegerField(null=True, blank=True)
-    remuneration_max = models.IntegerField(null=True, blank=True)
     video_link = models.URLField(null=True, blank=True)
     bank_acc_holder_name = models.CharField(max_length=255, null=True, blank=True)
     bank_name = models.CharField(max_length=255, null=True, blank=True)
@@ -60,4 +80,3 @@ class Teachers(models.Model):
     qualification = models.CharField(max_length=255, null=True, blank=True)
     black_list = models.BooleanField(default=False)
     active = models.BooleanField(default=False)
-    

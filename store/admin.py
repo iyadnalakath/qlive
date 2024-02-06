@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Subject,Teachers
+from .models import Subject,Teachers,Grade,Remuneration
 
 # Register your models here.
 
@@ -7,6 +7,14 @@ from .models import Subject,Teachers
 class SubjectAdmin(admin.ModelAdmin):
     list_display = ("id", "name")
 admin.site.register(Subject, SubjectAdmin)
+
+class GradeAdmin(admin.ModelAdmin):
+    list_display = ("id", "name")
+admin.site.register(Grade, GradeAdmin)
+
+class RemunerationAdmin(admin.ModelAdmin):
+    list_display = ("id", "teacher","grade","min_remuneration","max_remuneration")
+admin.site.register(Remuneration, RemunerationAdmin)
 
 
 class TeachersAdmin(admin.ModelAdmin):
@@ -18,8 +26,6 @@ class TeachersAdmin(admin.ModelAdmin):
         "email",
         "experience",
         "date",
-        "remuneration_min",
-        "remuneration_max",
         "video_link",
         "bank_acc_holder_name",
         "bank_name",

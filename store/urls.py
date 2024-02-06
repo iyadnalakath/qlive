@@ -10,6 +10,7 @@ urlpatterns = [
 router = routers.DefaultRouter()
 router.register("subject", views.SubjectViewSet)
 router.register("teacher", TeacherViewSet, basename='teacher')
+router.register("grade", GradeViewSet, basename='grade')
 
 
 urlpatterns = router.urls + urlpatterns

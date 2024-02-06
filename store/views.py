@@ -80,6 +80,61 @@ class SubjectViewSet(ModelViewSet):
                 raise PermissionDenied("You are not allowed to update this object.")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class GradeViewSet(ModelViewSet):
+    queryset = Grade.objects.all()
+    serializer_class = GradeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        if request.user.role in ["admin", "staff"]:
+            queryset = Grade.objects.all()
+            serializer = GradeSerializer(queryset, many=True)
+            return Response(serializer.data)
+        else:
+            raise PermissionDenied("You are not allowed to view subjects.")
+        
+    def retrieve(self, request, *args, **kwargs):
+        grade = self.get_object()
+        if request.user.role in ["admin", "staff"]:
+            serializer = GradeSerializer(grade)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            raise PermissionDenied("You are not allowed to view this object.")
+
+    def create(self, request, *args, **kwargs):
+        serializer = GradeSerializer(data=request.data)
+        if serializer.is_valid():
+            if self.request.user.role == "admin":
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                raise PermissionDenied("You are not allowed to create this object.")
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    def destroy(self, request, *args, **kwargs):
+        grade = self.get_object()
+
+        if request.user.role == "admin":
+            try:
+                grade.delete()
+                return Response({'response': 'Grade deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+            except ValidationError as e:
+                return Response({'error': e.message}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            raise PermissionDenied("You are not allowed to delete this object.")
+        
+    def update(self, request, *args, **kwargs):
+        grade = self.get_object()
+        serializer = GradeSerializer(grade, data=request.data)
+        if serializer.is_valid():
+            if request.user.role == "admin":
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                raise PermissionDenied("You are not allowed to update this object.")
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class TeacherViewSet(ModelViewSet):
     queryset = Teachers.objects.prefetch_related('subject').all()
