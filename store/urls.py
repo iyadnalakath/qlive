@@ -4,7 +4,8 @@ from . import views
 from .views import *
 
 urlpatterns = [
-    
+    path('remunerations/', RemunerationListCreateView.as_view(), name='remuneration-list-create'),
+    path('remunerations/<int:pk>/', RemunerationRetrieveUpdateDestroyView.as_view(), name='remuneration-retrieve-update-destroy'),
 ]
 
 router = routers.DefaultRouter()

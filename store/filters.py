@@ -1,6 +1,8 @@
 import django_filters
 from django_filters import rest_framework as filters
+from django.db.models import Q
 from .models import Teachers
+
 
 # class TeacherFilter(django_filters.FilterSet):
 #     has_roll_no = filters.BooleanFilter(

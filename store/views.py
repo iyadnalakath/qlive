@@ -6,6 +6,8 @@ from rest_framework.filters import SearchFilter
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics, permissions
+from .permission import AdminOrStaffPermission
 from .models import *
 from .serializer import *
 from .filters import TeacherFilter
@@ -136,6 +138,22 @@ class GradeViewSet(ModelViewSet):
                 raise PermissionDenied("You are not allowed to update this object.")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class RemunerationListCreateView(generics.ListCreateAPIView):
+    queryset = Remuneration.objects.all()
+    serializer_class = RemunerationSerializer
+    permission_classes = [permissions.IsAuthenticated, AdminOrStaffPermission]
+
+class RemunerationRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Remuneration.objects.all()
+    serializer_class = RemunerationSerializer
+    permission_classes = [permissions.IsAuthenticated, AdminOrStaffPermission]
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({"detail": "Remuneration successfully deleted."}, status=status.HTTP_204_NO_CONTENT)
+
 class TeacherViewSet(ModelViewSet):
     queryset = Teachers.objects.prefetch_related('subject').all()
     serializer_class = TeacherSerializer
@@ -201,7 +219,7 @@ class TeacherViewSet(ModelViewSet):
                 raise PermissionDenied("You are not allowed to update this object.")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        
+    
     def retrieve(self, request, *args, **kwargs):
         teacher = self.get_object()
         if request.user.role in ["admin", "staff"]:
