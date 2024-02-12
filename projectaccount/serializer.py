@@ -9,17 +9,35 @@ from .function import send_otp_email
 
 
 
+# class LoginSerializer(serializers.Serializer):
+#     username = serializers.CharField()
+#     password = serializers.CharField(style={"input_type": "password"})
+
+#     def validate(self, data):
+#         user = authenticate(**data)
+#         if user and user.is_active:
+#             return user
+#         raise serializers.ValidationError("Incorrect Credentials")
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(style={"input_type": "password"})
 
     def validate(self, data):
-        user = authenticate(**data)
-        if user and user.is_active:
-            return user
-        raise serializers.ValidationError("Incorrect Credentials")
-    
+        username = data.get('username')
+        password = data.get('password')
 
+        # Check if the user with the given username exists
+        try:
+            user = Account.objects.get(username=username)
+        except Account.DoesNotExist:
+            raise serializers.ValidationError("Incorrect username")
+
+        # Verify the provided password
+        if not user.check_password(password):
+            raise serializers.ValidationError("Incorrect password")
+
+        return user
+    
 class LogoutSerializer(serializers.Serializer):
     pass
 
