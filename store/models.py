@@ -72,6 +72,8 @@ class Teachers(models.Model):
     bank_name = models.CharField(max_length=255, null=True, blank=True)
     branch = models.CharField(max_length=255, null=True, blank=True)
     ifsc_code = models.CharField(max_length=255, null=True, blank=True)
+    google_pay = models.BigIntegerField(default=0)
+    phone_pay = models.BigIntegerField(default=0)
     success_demo = models.IntegerField(default=0)
     failed_demo = models.IntegerField(default=0)
     teacher_change = models.IntegerField(default=0)
@@ -80,3 +82,4 @@ class Teachers(models.Model):
     qualification = models.CharField(max_length=255, null=True, blank=True)
     black_list = models.BooleanField(default=False)
     active = models.BooleanField(default=False)
+

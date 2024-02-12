@@ -54,6 +54,8 @@ class TeacherSerializer(serializers.ModelSerializer):
             "bank_name",
             "branch",
             "ifsc_code",
+            "google_pay",
+            "phone_pay",
             "about",
             "remark",
             "qualification",
