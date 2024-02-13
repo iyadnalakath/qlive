@@ -12,11 +12,11 @@ class Subject(models.Model):
         return self.name
 
 
-@receiver(pre_delete, sender=Subject)
-def protect_subject_delete(sender, instance, **kwargs):
-    # Check if any teachers are associated with the subject
-    if instance.teachers.exists():
-        raise ValidationError("Cannot delete the subject as it is associated with teachers.")
+# @receiver(pre_delete, sender=Subject)
+# def protect_subject_delete(sender, instance, **kwargs):
+#     # Check if any teachers are associated with the subject
+#     if instance.teachers.exists():
+#         raise ValidationError("Cannot delete the subject as it is associated with teachers.")
     
 
 class Grade(models.Model):
@@ -83,3 +83,8 @@ class Teachers(models.Model):
     black_list = models.BooleanField(default=False)
     active = models.BooleanField(default=False)
 
+@receiver(pre_delete, sender=Subject)
+def protect_subject_delete(sender, instance, **kwargs):
+    # Check if any teachers are associated with the subject
+    if Teachers.objects.filter(subject=instance).exists():
+        raise ValidationError("Cannot delete the subject as it is associated with teachers.")
