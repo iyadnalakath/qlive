@@ -25,11 +25,11 @@ class Grade(models.Model):
     def __str__(self):
         return self.name
     
-@receiver(pre_delete, sender=Grade)
-def protect_grade_delete(sender, instance, **kwargs):
-    # Check if any remunerations are associated with the grade
-    if instance.grade_remunerations.exists():
-        raise ValidationError("Cannot delete the grade as it is associated with teacher")
+# @receiver(pre_delete, sender=Grade)
+# def protect_grade_delete(sender, instance, **kwargs):
+#     # Check if any remunerations are associated with the grade
+#     if instance.grade_remunerations.exists():
+#         raise ValidationError("Cannot delete the grade as it is associated with teacher")
     
 class Remuneration(models.Model):
     teacher = models.ForeignKey('Teachers', on_delete=models.CASCADE, related_name='remunerations')
@@ -83,8 +83,8 @@ class Teachers(models.Model):
     black_list = models.BooleanField(default=False)
     active = models.BooleanField(default=False)
 
-@receiver(pre_delete, sender=Subject)
-def protect_subject_delete(sender, instance, **kwargs):
-    # Check if any teachers are associated with the subject
-    if Teachers.objects.filter(subject=instance).exists():
-        raise ValidationError("Cannot delete the subject as it is associated with teachers.")
+# @receiver(pre_delete, sender=Subject)
+# def protect_subject_delete(sender, instance, **kwargs):
+#     # Check if any teachers are associated with the subject
+#     if Teachers.objects.filter(subject=instance).exists():
+#         raise ValidationError("Cannot delete the subject as it is associated with teachers.")

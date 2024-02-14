@@ -59,7 +59,7 @@ class SubjectViewSet(ModelViewSet):
 
         try:
             # Trigger pre_delete signal to check association with teachers
-            protect_subject_delete(sender=Subject, instance=subject)
+            # protect_subject_delete(sender=Subject, instance=subject)
 
             if request.user.role == "admin":
                 subject.delete()
