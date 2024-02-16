@@ -62,7 +62,8 @@ class Teachers(models.Model):
     #     Grade, related_name="teacher_grades",blank=True
     # )
     whatsapp_no = models.CharField(max_length=25, null=True, blank=True)
-    email = models.EmailField(max_length=255,null=True,blank=True)
+    contact_no = models.CharField(max_length=25, null=True, blank=True)
+    email = models.EmailField(max_length=255,null=False,blank=False)
     experience = models.FloatField(default=0, null=True, blank=True)
     english_fluency = models.CharField(max_length=15, choices=english_fluency_choices,null=True,blank=True)
     interview_rating = models.CharField(max_length=15, choices=interview_rating_choices,null=True,blank=True)

@@ -46,6 +46,7 @@ class TeacherSerializer(serializers.ModelSerializer):
             "subject",
             "subject_name",
             "whatsapp_no",
+            "contact_no",
             "email",
             "experience",
             "date",

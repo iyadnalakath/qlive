@@ -23,6 +23,7 @@ class TeachersAdmin(admin.ModelAdmin):
         "teacher_name",
         "roll_no",
         "whatsapp_no",
+        "contact_no",
         "email",
         "experience",
         "date",
