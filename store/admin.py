@@ -31,6 +31,7 @@ class TeachersAdmin(admin.ModelAdmin):
         "bank_acc_holder_name",
         "bank_name",
         "branch",
+        "account_no",
         "ifsc_code",
         "google_pay",
         "phone_pay",

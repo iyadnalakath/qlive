@@ -53,6 +53,7 @@ class TeacherSerializer(serializers.ModelSerializer):
             "video_link",
             "bank_acc_holder_name",
             "bank_name",
+            "account_no",
             "branch",
             "ifsc_code",
             "google_pay",
