@@ -18,10 +18,11 @@ class GradeSerializer(serializers.ModelSerializer):
 
 class RemunerationSerializer(serializers.ModelSerializer):
     teacher = serializers.SerializerMethodField()
+    grade_name = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Remuneration
-        fields = ['id','teacher', 'grade', 'min_remuneration', 'max_remuneration']
+        fields = ['id','teacher', 'grade','grade_name','min_remuneration', 'max_remuneration']
 
     def get_teacher(self, obj):
         teacher = obj.teacher
@@ -30,6 +31,10 @@ class RemunerationSerializer(serializers.ModelSerializer):
             "teacher_name": teacher.teacher_name,
             
         }
+    def get_grade_name(self, obj):
+        grade = obj.grade
+        return grade.name if grade else None
+    
 class TeacherSerializer(serializers.ModelSerializer):
     total_rating = serializers.SerializerMethodField()
     subject_name = serializers.StringRelatedField(source="subject", many=True, read_only=True)
@@ -203,7 +208,9 @@ class SimpleTeacherSerializer(serializers.ModelSerializer):
             "roll_no",
             "black_list",
             "total_rating",
+            "date",
             "about",
+            
         ]
 
     def get_total_rating(self, obj):
