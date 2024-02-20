@@ -64,7 +64,9 @@ class RegisterUserView(APIView):
 
             data["email"] = account.email
             data["username"] = account.username
+            # data["full_name"] = account.full_name
             data["pk"] = account.pk
+            data["password"] = account.password
             data["response"] = "successfully registered new user."
 
             token = Token.objects.get(user=account).key

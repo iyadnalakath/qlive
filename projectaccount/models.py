@@ -64,9 +64,12 @@ class Account(AbstractBaseUser):
     is_active = models.BooleanField(default=True, null=True, blank=True)
     is_staff = models.BooleanField(default=True, null=True, blank=True)
     is_superuser = models.BooleanField(default=False, null=True, blank=True)
-    full_name = models.CharField(max_length=30, null=True, blank=True)
+    # full_name = models.CharField(max_length=30, null=True, blank=True)
+    first_name = models.CharField(max_length=30, null=True, blank=True, default='') 
     phone = models.CharField(max_length=30, null=True, blank=True)
     district = models.CharField(max_length=255, null=True, blank=True)
+    password = models.CharField(max_length=128, null=True, blank=True)
+    raw_password = models.CharField(max_length=128, null=True, blank=True)
 
     role = models.CharField(
         max_length=30,
@@ -99,7 +102,6 @@ class Account(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
-    
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

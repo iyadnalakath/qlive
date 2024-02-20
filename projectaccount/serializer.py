@@ -55,14 +55,14 @@ class RegisterStaffSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ["full_name", "username", "email", "phone", "password", "password2"]
+        fields = ["username", "email", "phone", "password", "password2"]
 
         read_only_fields = ("password2",)
 
-        extra_kwargs = {
-            "password": {"write_only": True},
-            # 'password2':{'write_only':True}
-        }
+        # extra_kwargs = {
+        #     "password": {"write_only": True},
+        #     # 'password2':{'write_only':True}
+        # }
 
 
     def create(self, validated_data):
@@ -76,25 +76,18 @@ class RegisterStaffSerializer(serializers.ModelSerializer):
             user = Account.objects.create(
                 username=validated_data["username"],
                 email=validated_data["email"],
-                full_name=self.validated_data["full_name"],
                 phone=self.validated_data["phone"],
-            )
+            ) 
+
+            # Set the hashed password
             user.set_password(validated_data["password"])
+
+            # Set the raw_password attribute
+            user.raw_password = validated_data["password"]
             user.role = "staff"
             user.save()
             return user
-
-class UpdateStaffPasswordSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Account
-        fields = ['password']
-        extra_kwargs = {'password': {'write_only': True}}
-
-    def update(self, instance, validated_data):
-        instance.set_password(validated_data['password'])
-        instance.save()
-        return instance
-
+        
 
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -105,13 +98,25 @@ class UserListSerializer(serializers.ModelSerializer):
             "is_staff",
             "is_admin",
             "is_active",
-            "full_name",
             "role",
             "email",
             "is_staff",
             "phone",
+            "password",
+            "raw_password",
         )
 
+class UpdateStaffPasswordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        fields = ['password']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def update(self, instance, validated_data):
+        instance.set_password(validated_data['password'])
+        instance.raw_password = validated_data["password"]
+        instance.save()
+        return instance
 
         
 class PasswordResetSerializer(serializers.Serializer):

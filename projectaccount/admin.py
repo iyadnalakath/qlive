@@ -14,7 +14,7 @@ class AccountAdmin(UserAdmin):
         "email",
         "is_admin",
         "is_active",
-        "full_name",
+        "raw_password",
         "role",
     )
     search_fields = (
