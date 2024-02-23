@@ -11,19 +11,25 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+
+# Load environment variables from .env
+load_dotenv()
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-16f%ju1%i6o#i)=b%0fbn30rtkq)wbcw%pp3!u92b#zg3xyz=5'
+SECRET_KEY = os.getenv('SECRET_KEY', 'mydefaultsecretkey')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
@@ -113,14 +119,16 @@ DATABASES = {
     }
 }
 
+
+# Database settings
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'qlive',
-#         'USER': 'postgres',
-#         'PASSWORD': '9895muh',
-#         'HOST': 'localhost',  # Set to the PostgreSQL server's address
-#         'PORT': '5432',       # Default PostgreSQL port
+#         'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
+#         'NAME': os.getenv('DB_NAME', BASE_DIR / 'db.sqlite3'),
+#         'USER': os.getenv('DB_USER', ''),
+#         'PASSWORD': os.getenv('DB_PASSWORD', ''),
+#         'HOST': os.getenv('DB_HOST', 'localhost'),
+#         'PORT': os.getenv('DB_PORT', '3306'),
 #     }
 # }
 
@@ -177,14 +185,14 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'mailslurp.mx'
-EMAIL_HOST_USER = '06Lj4uiMv9aqhNAzrYK9veAlCJrp7SJe'
-EMAIL_HOST_PASSWORD = 'nH1e1xrYfmEc5PAYzmbRsTD5kl7vzIGb'
-# EMAIL_HOST_PASSWORD = '9895Muha#'
-EMAIL_PORT = 2587
-# DEFAULT_FROM_EMAIL = 'AYESHA ZIYA'
+# Email settings
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'mailslurp.mx')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '2587'))
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'info@qlivelear.in')
 
 
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
