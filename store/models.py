@@ -67,7 +67,7 @@ class Teachers(models.Model):
     experience = models.FloatField(default=0, null=True, blank=True)
     english_fluency = models.CharField(max_length=15, choices=english_fluency_choices,null=True,blank=True)
     interview_rating = models.CharField(max_length=15, choices=interview_rating_choices,null=True,blank=True)
-    date = models.DateTimeField(auto_now=True)
+    date = models.DateTimeField(auto_now_add=True)
     video_link = models.URLField(null=True, blank=True)
     bank_acc_holder_name = models.CharField(max_length=255, null=True, blank=True)
     bank_name = models.CharField(max_length=255, null=True, blank=True)

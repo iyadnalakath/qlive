@@ -185,3 +185,13 @@ EMAIL_HOST_PASSWORD = 'nH1e1xrYfmEc5PAYzmbRsTD5kl7vzIGb'
 # EMAIL_HOST_PASSWORD = '9895Muha#'
 EMAIL_PORT = 2587
 # DEFAULT_FROM_EMAIL = 'AYESHA ZIYA'
+
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_USE_TLS = True
+# EMAIL_HOST = 'smtp.zoho.com'
+# EMAIL_HOST_USER = 'info@qlivelear.in'
+# EMAIL_HOST_PASSWORD = 'Qliveshadan9746@'
+# # EMAIL_HOST_PASSWORD = '9895Muha#'
+# EMAIL_PORT = 465 
+# # DEFAULT_FROM_EMAIL = 'AYESHA ZIYA'

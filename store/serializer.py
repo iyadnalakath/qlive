@@ -95,36 +95,10 @@ class TeacherSerializer(serializers.ModelSerializer):
 
         return teacher
     
-    # def update(self, instance, validated_data):
-    #     remunerations_data = validated_data.pop('remunerations', None)
-
-    #     # Update Teacher fields
-    #     instance = super().update(instance, validated_data)
-
-    #     # Update or create associated Remuneration objects
-    #     if remunerations_data is not None:
-    #         for remuneration_data in remunerations_data:
-    #             remuneration_id = remuneration_data.get('id', None)
-    #             grade_instance = remuneration_data.pop('grade', None)
-
-    #             # Retrieve or create grade_instance
-    #             grade_instance_obj, _ = Grade.objects.get_or_create(name=grade_instance)
-
-    #             # Check if a Remuneration instance with the same grade already exists
-    #             existing_remuneration = instance.remunerations.filter(grade=grade_instance_obj).first()
-
-    #             if existing_remuneration:
-    #                 # Update existing Remuneration instance
-    #                 RemunerationSerializer().update(existing_remuneration, remuneration_data)
-    #             else:
-    #                 # Create a new Remuneration instance
-    #                 Remuneration.objects.create(teacher=instance, grade=grade_instance_obj, **remuneration_data)
-
-    #     return instance
 
     def update(self, instance, validated_data):
         remunerations_data = validated_data.pop('remunerations', None)
-
+        validated_data.pop('date', None)
         # Update Teacher fields
         instance = super().update(instance, validated_data)
 
