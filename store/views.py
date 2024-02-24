@@ -1,12 +1,15 @@
 from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework.response import Response
 from rest_framework.filters import SearchFilter
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, permissions
+from rest_framework.pagination import PageNumberPagination
+from django.core.paginator import Paginator
 from .permission import AdminOrStaffPermission
 from .models import *
 from .serializer import *
@@ -153,6 +156,13 @@ class RemunerationRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVie
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response({"detail": "Remuneration successfully deleted."}, status=status.HTTP_204_NO_CONTENT)
+    
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 10  # Set the desired page size
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
 
 class TeacherViewSet(ModelViewSet):
     queryset = Teachers.objects.prefetch_related('subject').all()
@@ -163,30 +173,76 @@ class TeacherViewSet(ModelViewSet):
     filterset_class = TeacherFilter
     search_fields = ["teacher_name","roll_no"]
 
-    
+    pagination_class = StandardResultsSetPagination
+
     def list(self, request, *args, **kwargs):
         if request.user.role in ["admin", "staff"]:
             queryset = Teachers.objects.all()
-            queryset = self.filter_queryset(queryset)
-            
-            ordering_param = self.request.query_params.get('ordering', 'total_rating')
-            total_count = queryset.count()
-            if ordering_param == 'total_rating':
-                serializer = SimpleTeacherSerializer(queryset, many=True)
-
-                sorted_data = sorted(serializer.data, key=lambda x: x['total_rating'], reverse=True)
-                response_data = {
-                'total_count': total_count,
-                'teachers': sorted_data
-            }
-                return Response(response_data)
-            
-            serializer = SimpleTeacherSerializer(queryset, many=True)
-            return Response(serializer.data)
         else:
-            raise PermissionDenied("You are not allowed to view subjects.")
+            raise PermissionDenied("You are not allowed to view teacher.")
 
-    
+        queryset = self.filter_queryset(queryset)
+        total_count = queryset.count()
+
+        # Serialize the queryset
+        serializer = SimpleTeacherSerializer(queryset, many=True)
+
+        # Sort results based on total_rating after serialization
+        sorted_data = sorted(serializer.data, key=lambda x: x['total_rating'], reverse=True)
+
+        # Get the requested page number from the query parameter
+        page_number = request.query_params.get('page', 1)
+
+        # Create a Paginator instance with the page size
+        paginator = Paginator(sorted_data, self.pagination_class.page_size)
+
+        try:
+            # Try to get the requested page, or return an empty list if invalid
+            page = paginator.page(page_number)
+        except (PageNotAnInteger, EmptyPage):
+            return Response({
+                'total_count': total_count,
+                'total_pages': paginator.num_pages,
+                'page_size': self.pagination_class.page_size,
+                'current_page': 0,  # Indicate that it's an empty page
+                'results': [],
+            })
+
+        # Include pagination information in the response
+        response_data = {
+            'total_count': total_count,
+            'total_pages': paginator.num_pages,
+            'page_size': self.pagination_class.page_size,
+            'current_page': page.number,
+            'results': page.object_list,  # Use the paginated results
+        }
+
+        return Response(response_data)
+    # def list(self, request, *args, **kwargs):
+    #     if request.user.role in ["admin", "staff"]:
+    #         queryset = Teachers.objects.all()
+    #         queryset = self.filter_queryset(queryset)
+            
+            
+    #         ordering_param = self.request.query_params.get('ordering', 'total_rating')
+    #         total_count = queryset.count()
+    #         if ordering_param == 'total_rating':
+    #             serializer = SimpleTeacherSerializer(queryset, many=True)
+
+    #             sorted_data = sorted(serializer.data, key=lambda x: x['total_rating'], reverse=True)
+    #             response_data = {
+    #             'total_count': total_count,
+    #             'teachers': sorted_data
+    #         }
+    #             return Response(response_data)
+            
+    #         serializer = SimpleTeacherSerializer(queryset, many=True)
+    #         return Response(serializer.data)
+    #     else:
+    #         raise PermissionDenied("You are not allowed to view subjects.")
+
+
+        
     def create(self, request, *args, **kwargs):
         serializer = TeacherSerializer(data=request.data)
         if serializer.is_valid():
@@ -203,7 +259,7 @@ class TeacherViewSet(ModelViewSet):
         teacher = self.get_object()
         if request.user.role == "admin":
             teacher.delete()
-            return Response({'response': 'Subject deleted successfully.'},status=status.HTTP_204_NO_CONTENT)
+            return Response({'response': 'teacher deleted successfully.'},status=status.HTTP_204_NO_CONTENT)
         else:
             raise PermissionDenied("You are not allowed to delete this object.")
         

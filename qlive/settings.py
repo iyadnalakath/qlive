@@ -139,6 +139,10 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 40,  # Set the default page size
+
+ 
 }
 
 
@@ -192,7 +196,7 @@ EMAIL_HOST = os.getenv('EMAIL_HOST', 'mailslurp.mx')
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', '2587'))
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'info@qlivelear.in')
+# DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'info@qlivelear.in')
 
 
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
