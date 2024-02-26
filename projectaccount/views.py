@@ -64,7 +64,6 @@ class RegisterUserView(APIView):
 
             data["email"] = account.email
             data["username"] = account.username
-            # data["full_name"] = account.full_name
             data["pk"] = account.pk
             data["password"] = account.password
             data["response"] = "successfully registered new user."
@@ -106,30 +105,6 @@ class UpdateStaffPasswordView(generics.UpdateAPIView):
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
-    # def post(self, request):
-    #     serializer = LoginSerializer(data=request.data)
-    #     context = {}
-    #     if serializer.is_valid():
-    #         user = serializer.validated_data
-
-    #         username = request.data.get("username")
-    #         password = request.data.get("password")
-    #         try:
-    #             token = Token.objects.get(user=user)
-    #         except:
-    #             token = Token.objects.create(user=user)
-
-    #         context["response"] = "Successfully authenticated."
-    #         context["pk"] = user.pk
-    #         context["username"] = username.lower()
-    #         context["token"] = token.key
-    #         context["role"] = user.role
-    #         context["response"] = "Successfully authenticated."
-    #         return Response(context, status=status.HTTP_200_OK)
-    #     else:
-    #         context["response"] = "Error"
-    #         context["error_message"] = "The username or password is incorrect"
-    #         return Response(context, status=status.HTTP_401_UNAUTHORIZED)
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         context = {}

@@ -40,7 +40,7 @@ class TeacherSerializer(serializers.ModelSerializer):
     subject_name = serializers.StringRelatedField(source="subject", many=True, read_only=True)
     total_point = serializers.SerializerMethodField()
     remunerations = RemunerationSerializer(many=True)
-    # remunerations_details = serializers.SerializerMethodField()
+   
 
     class Meta:
         model = Teachers
@@ -76,7 +76,7 @@ class TeacherSerializer(serializers.ModelSerializer):
             "interview_rating",
             "total_rating",
             "remunerations",
-            # "remunerations_details"
+            
         ]
 
     def create(self, validated_data):
@@ -99,21 +99,20 @@ class TeacherSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         remunerations_data = validated_data.pop('remunerations', None)
         validated_data.pop('date', None)
-        # Update Teacher fields
+       
         instance = super().update(instance, validated_data)
 
-        # Update or create associated Remuneration objects
+        
         if remunerations_data is not None:
-            # If remunerations_data is provided, clear existing remunerations
             instance.remunerations.all().delete()
 
             for remuneration_data in remunerations_data:
                 grade_instance = remuneration_data.pop('grade', None)
 
-                # Retrieve or create grade_instance
+               
                 grade_instance_obj, _ = Grade.objects.get_or_create(name=grade_instance)
 
-                # Create a new Remuneration instance
+                
                 Remuneration.objects.create(teacher=instance, grade=grade_instance_obj, **remuneration_data)
 
         return instance
