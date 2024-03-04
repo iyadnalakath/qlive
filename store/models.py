@@ -83,7 +83,7 @@ class Teachers(models.Model):
     remark = models.TextField(null=True, blank=True)
     qualification = models.CharField(max_length=255, null=True, blank=True)
     black_list = models.BooleanField(default=False)
-    active = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
 
 # @receiver(pre_delete, sender=Subject)
 # def protect_subject_delete(sender, instance, **kwargs):

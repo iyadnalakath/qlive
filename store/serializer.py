@@ -161,7 +161,7 @@ class TeacherSerializer(serializers.ModelSerializer):
         teacher_change_point = obj.teacher_change
 
  
-        total_point = success_demo_point+failed_demo_point+teacher_change_point
+        total_point = success_demo_point-failed_demo_point-teacher_change_point
 
         return total_point
     
