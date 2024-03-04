@@ -54,7 +54,7 @@ class Teachers(models.Model):
     ]
 
     teacher_name = models.CharField(max_length=255, null=False, blank=False)
-    roll_no = models.IntegerField(unique=True,null=True, blank=True)
+    roll_no = models.CharField(max_length=25, null=True, blank=True)
     subject = models.ManyToManyField(
         Subject, related_name="teachers_subject",blank=True
     )
@@ -74,8 +74,8 @@ class Teachers(models.Model):
     account_no = models.BigIntegerField(default=0)
     branch = models.CharField(max_length=255, null=True, blank=True)
     ifsc_code = models.CharField(max_length=255, null=True, blank=True)
-    google_pay = models.BigIntegerField(default=0)
-    phone_pay = models.BigIntegerField(default=0)
+    google_pay = models.CharField(max_length=25, null=True, blank=True)
+    phone_pay = models.CharField(max_length=25, null=True, blank=True)
     success_demo = models.IntegerField(default=0)
     failed_demo = models.IntegerField(default=0)
     teacher_change = models.IntegerField(default=0)

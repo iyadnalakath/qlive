@@ -49,14 +49,13 @@ class TeacherFilter(django_filters.FilterSet):
         method='filter_grade',
         label='Grade',
     )
-
     def filter_has_roll_no(self, queryset, name, value):
         if value:
-            # Filter teachers with roll numbers
-            return queryset.filter(roll_no__isnull=False)
+            # Filter teachers with non-empty roll numbers
+            return queryset.exclude(roll_no__exact="")
         else:
-            # Filter teachers without roll numbers
-            return queryset.exclude(roll_no__isnull=False)
+            # Filter teachers with empty roll numbers
+            return queryset.filter(roll_no__exact="")
 
     def filter_experience(self, queryset, name, value):
         # Filter teachers with experience greater than or equal to the provided value
