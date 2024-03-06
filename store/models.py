@@ -71,7 +71,7 @@ class Teachers(models.Model):
     video_link = models.URLField(null=True, blank=True)
     bank_acc_holder_name = models.CharField(max_length=255, null=True, blank=True)
     bank_name = models.CharField(max_length=255, null=True, blank=True)
-    account_no = models.BigIntegerField(default=0)
+    account_no = models.CharField(max_length=50, null=True, blank=True)
     branch = models.CharField(max_length=255, null=True, blank=True)
     ifsc_code = models.CharField(max_length=255, null=True, blank=True)
     google_pay = models.CharField(max_length=25, null=True, blank=True)
