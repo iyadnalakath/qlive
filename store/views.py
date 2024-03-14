@@ -159,7 +159,7 @@ class RemunerationRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIVie
     
 
 class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 10  # Set the desired page size
+    page_size = 40  # Set the desired page size
     page_size_query_param = 'page_size'
     max_page_size = 100
 
